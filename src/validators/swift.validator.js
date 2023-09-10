@@ -12,6 +12,30 @@ const validateColumns = (column) => {
     return true;
 }
 
+const validateNumber = (limit, allowNull) => {
+    if (!limit ) return allowNull ?? false; 
+    if (!isNaN(limit)) return true;
+    return false;
+}
+
+const validateOrder = (order) => {
+    if(!order) return true;
+    const columns = order.split(',');
+    columns.forEach(c => {
+        const orderColumn = c.split(' ');
+        if (orderColumn.length > 2) return false;
+        if (!columnList.includes(orderColumn[0])) {
+            return false;
+        }
+        if (orderColumn[1] && !(orderColumn[1] === 'ASC' || orderColumn[1] === 'DESC')) {
+            return false;
+        }
+    });
+    return true;
+}
+
 module.exports = {
     validateColumns,
+    validateNumber,
+    validateOrder,
 }

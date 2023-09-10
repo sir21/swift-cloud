@@ -1,6 +1,5 @@
-const { getDatabase } = require('./database.service');
-const { validateColumns } = require('../validators/swift.validator');
-const { columnMapper } = require('../mappers/swift.mapper');
+const { getDatabase } = require("./database.service");
+const { requestMapper } = require("../mappers/swift.mapper");
 
 const querySwift = (db, sql) => {
   return new Promise((resolve, reject) => {
@@ -11,23 +10,23 @@ const querySwift = (db, sql) => {
       resolve(rows);
     });
   });
-}
+};
 
 const getSwiftService = async (query) => {
   const db = getDatabase();
-  if (!validateColumns(query.columns)) {
-    throw new Error('Invalid column params');
-  }
-  const column = columnMapper(query.columns);
+  const { columns, limit, offset, order } = requestMapper(query);
 
-  const sql = `SELECT ${column} FROM swift;`;
+  console.log("limit", limit);
+  const sql = `SELECT ${columns} FROM swift${
+    order ? ` ORDER BY ${order}` : ""
+  }${limit ? ` LIMIT ${limit} OFFSET ${offset}` : ""};`;
+
   const response = await querySwift(db, sql);
-  console.log(response);
 
   db.close();
   return response;
-}
+};
 
 module.exports = {
   getSwiftService,
-}
+};
