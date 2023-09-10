@@ -1,1 +1,9 @@
+# databases
 node_modules
+
+# ide files
+.DS_store
+
+# build files
+src/database/db.js
+

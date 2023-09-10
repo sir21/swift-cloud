@@ -4,17 +4,24 @@
   "description": "swift cloud project",
   "main": "index.js",
   "scripts": {
-    "start": "node ./src/index.js"
+    "remove-db": "rm ./src/database/db.js",
+    "start": "npm run remove-db && node ./src/index.js"
   },
-  "keywords": ["koa", "javascript","sheets"],
+  "keywords": [
+    "koa",
+    "javascript",
+    "sheets"
+  ],
   "author": "sir21",
   "license": "ISC",
   "dependencies": {
     "@koa/cors": "^4.0.0",
     "axios": "^1.5.0",
+    "csv": "^6.3.3",
     "koa": "^2.14.2",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^12.0.0",
-    "node-cache": "^5.1.2"
+    "node-cache": "^5.1.2",
+    "sqlite3": "^5.1.6"
   }
 }
