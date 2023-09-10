@@ -2,6 +2,6 @@ const Router = require("koa-router");
 const router = new Router();
 const {querySwift } = require('./controllers/swift.controllers');
 
-router.get("/swift", querySwift);
+router.get("/", querySwift);
 
 module.exports = router;

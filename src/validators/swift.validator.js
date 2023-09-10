@@ -18,6 +18,11 @@ const validateNumber = (limit, allowNull) => {
     return false;
 }
 
+const validateString = (str, allowNull) => {
+    if (!str) return allowNull ?? false;
+    return /^[A-Za-z0-9]*&/.test(str);
+}
+
 const validateOrder = (order) => {
     if(!order) return true;
     const columns = order.split(',');
@@ -37,5 +42,6 @@ const validateOrder = (order) => {
 module.exports = {
     validateColumns,
     validateNumber,
+    validateString,
     validateOrder,
 }

@@ -1,4 +1,5 @@
 const { validateColumns, validateNumber, validateOrder } = require('../validators/swift.validator');
+const { stringColumns, numberColumns} = require('../utils/const');
 
 const columnMapper = (columnString) => {
   if (!validateColumns(columnString)) {
@@ -33,15 +34,31 @@ const orderMapper = (orderString) => {
   return orderString ?? null;
 }
 
+const searchMapper = (searchString) => {
+  if (!searchString) return null;
+  const columns = searchString.split(',');
+  columns.forEach(c => {
+    const columnSearch = c.split(' ');
+    if(stringColumns.includes(columnSearch[0])) {
+
+    } else if (numberColumns.includes(columnSearch[0])) {
+
+    } else {
+      throw new Error('Invalid search');
+    }
+  });
+}
+
 const requestMapper = (query) => {
   // Map
   const columns = columnMapper(query.columns);
   const limit = limitMapper(query.limit);
   const offset = offsetMapper(query.offset);
   const order = orderMapper(query.order);
+  const search = searchMapper(query.search);
 
   // Return
-  return {columns, limit, offset, order}
+  return {columns, limit, offset, order, search}
 }
 
 module.exports = {

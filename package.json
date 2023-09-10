@@ -4,7 +4,7 @@
   "description": "swift cloud project",
   "main": "index.js",
   "scripts": {
-    "remove-db": "rm ./src/database/db.js",
+    "remove-db": "rm ./src/database/db.js || true",
     "start": "npm run remove-db && node ./src/index.js"
   },
   "keywords": [

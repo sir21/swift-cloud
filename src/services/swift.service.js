@@ -14,10 +14,10 @@ const querySwift = (db, sql) => {
 
 const getSwiftService = async (query) => {
   const db = getDatabase();
-  const { columns, limit, offset, order } = requestMapper(query);
+  const { columns, limit, offset, order, search } = requestMapper(query);
 
   console.log("limit", limit);
-  const sql = `SELECT ${columns} FROM swift${
+  const sql = `SELECT ${columns} FROM swift${search ? ` WHERE ${search}` : ""}${
     order ? ` ORDER BY ${order}` : ""
   }${limit ? ` LIMIT ${limit} OFFSET ${offset}` : ""};`;
 
