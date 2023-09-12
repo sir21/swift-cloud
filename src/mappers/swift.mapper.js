@@ -1,9 +1,12 @@
+var _ = require("lodash");
 const {
+  isNumberColumn,
+  isStringColumn,
   validateColumns,
   validateNumber,
   validateOrder,
+  isColumn,
 } = require("../validators/swift.validator");
-const { stringColumns, numberColumns } = require("../utils/const");
 
 const columnMapper = (columnString) => {
   if (!validateColumns(columnString)) {
@@ -35,78 +38,94 @@ const orderMapper = (orderString) => {
   if (!validateOrder(orderString)) {
     throw new Error("Invalid order");
   }
-  return orderString ?? null;
+  if (!orderString) return { orderString: null, newColumns: null };
+  if (!orderString.includes("|")) {
+    return { orderString, newColumns: null };
+  }
+  const finalOrder = [];
+  const newColumns = [];
+  const orders = orderString.split(",");
+  orders.forEach((order, i) => {
+    if (order.includes("|")) {
+      const orderData = order.split(" ");
+      const columns = orderData[0].split("|");
+      const columnName = `column${i}`;
+      newColumns.push(`(${columns.join("+")}) AS ${columnName}`);
+      if (orderData.length > 1) {
+        finalOrder.push(`${columnName} ${orderData[1]}`);
+      } else {
+        finalOrder.push(columnName);
+      }
+    } else {
+      finalOrder.push(order);
+    }
+  });
+  return {
+    orderString: finalOrder.join(","),
+    newColumns: newColumns.join(","),
+  };
 };
-
-const isNumberColumn = (column) => numberColumns.includes(column);
-const isStringColumn = (column) => stringColumns.includes(column);
 
 const getConditionOperator = (operator, value, column) => {
   switch (operator) {
     case "equal":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} = ${value}`;
     case "greater":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} > ${value}`;
     case "less":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} < ${value}`;
     case "greater_equal":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} >= ${value}`;
     case "less_equal":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} <= ${value}`;
     case "not_equal":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       return `${column} <> ${value}`;
     case "between":
-      if (!isNumberColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
+      isNumberColumn(
+        column,
+        `Invalid search. Invalid search operator for ${column}`
+      );
       const values = value.split(" ");
-      console.log('values');
       if (values.length !== 2)
         throw new Error(
           `Invalid search. Invalid search operator for ${column}`
         );
       return `${column} BETWEEN ${values[0]} AND ${values[1]}`;
     case "like":
-      if (!isStringColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
-      return `${column} LIKE '%${value}%'`;
-    case "in":
-      if (!isStringColumn(column))
-        throw new Error(
-          `Invalid search. Invalid search operator for ${column}`
-        );
-      return `${column} IN (${value})`;
-    default:
-      throw new Error(
+      isStringColumn(
+        column,
         `Invalid search. Invalid search operator for ${column}`
       );
+      return `${column} LIKE '%${value}%'`;
+    case "in":
+      isColumn(column, `Invalid search. Invalid search operator for ${column}`);
+      return `${column} IN (${value})`;
+    default:
+      throw new Error(`Invalid search. Invalid search operator for ${column}`);
   }
 };
 
@@ -124,7 +143,7 @@ const searchMapper = (searchString) => {
       getConditionOperator(columnSearch[1], columnSearch[2], columnSearch[0])
     );
   });
-  return searchList.join(" AND ");
+  return _.uniqWith(searchList, _.isEqual).join(" AND ");
 };
 
 const requestMapper = (query) => {
@@ -132,11 +151,11 @@ const requestMapper = (query) => {
   const columns = columnMapper(query.columns);
   const limit = limitMapper(query.limit);
   const offset = offsetMapper(query.offset);
-  const order = orderMapper(query.order);
+  const { orderString, newColumns } = orderMapper(query.order);
   const search = searchMapper(query.search);
 
   // Return
-  return { columns, limit, offset, order, search };
+  return { columns, limit, offset, orderString, search, newColumns };
 };
 
 module.exports = {
