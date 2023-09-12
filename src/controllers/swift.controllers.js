@@ -1,14 +1,17 @@
+const { responseMapper } = require("../mappers/swift.mapper");
 const { getSwiftService } = require("../services/swift.service");
 
 const querySwift = async (ctx) => {
   const query = ctx.request.query;
   try {
     const data = await getSwiftService(query);
-    ctx.body = data;
+    ctx.body = responseMapper(data);
     ctx.status = 200;
   } catch (e) {
-    console.log(e);
-    ctx.status = 504;
+    if (e.message.contains("SQLITE_ERROR")) {
+      ctx.throw(500);
+    }
+    ctx.throw(400, e.message)
   }
 };
 

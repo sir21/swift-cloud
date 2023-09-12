@@ -23,6 +23,7 @@ const getSwiftService = async (query) => {
     orderString ? ` ORDER BY ${orderString}` : ""
   }${limit ? ` LIMIT ${limit} OFFSET ${offset * limit}` : ""};`;
 
+  console.log(sql);
   const response = await querySwift(db, sql);
 
   db.close();

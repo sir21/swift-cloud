@@ -123,7 +123,7 @@ const getConditionOperator = (operator, value, column) => {
       return `${column} LIKE '%${value}%'`;
     case "in":
       isColumn(column, `Invalid search. Invalid search operator for ${column}`);
-      return `${column} IN (${value})`;
+      return `${column} IN (${value.split(" ").join(",")})`;
     default:
       throw new Error(`Invalid search. Invalid search operator for ${column}`);
   }
@@ -158,6 +158,24 @@ const requestMapper = (query) => {
   return { columns, limit, offset, orderString, search, newColumns };
 };
 
+const responseMapper = (results) => {
+  return results.map((result) => {
+    const res = {
+      Song: result.song,
+      Artist: result.artist,
+      Writer: result.writer,
+      Album: result.album,
+      Year: result.year,
+      "Plays June": result.plays_june,
+      "Plays July": result.plays_july,
+      "Plays - August": result.plays_august,
+    };
+
+    return _.omitBy(res, _.isNil);
+  });
+};
+
 module.exports = {
   requestMapper,
+  responseMapper,
 };
