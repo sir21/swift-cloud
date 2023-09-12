@@ -48,6 +48,8 @@ ex: `song` Result will be ordered by song ascending order
 ex: `song DESC` Result will be ordered by song descending order
 ex: `year DESC,plays_june` Results will be ordered by year descending order and plays_june ascending order.
 
+- To get most played songs for month of June and July `plays_june|plays_july DESC`
+
 **search** - `string` - *optional*
 *default - no search of filtering in results*
 
@@ -62,3 +64,11 @@ ex: `year|equal|2019` this will return songs released in 2019
 ex: `song|like|the` this will return all the song titles which include *the*
 
 ## Call API
+
+Import *postman collection* from `./postman` directory and start the server to call the api
+
+## Test
+
+- `npm start` start the server and *stop* the server. It will create the database(db.js).
+
+- `npm test` it will run unit tests with jest
